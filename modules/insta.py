@@ -6,20 +6,101 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+
 
 import time
+import random
+import os
+import zipfile
 
 class InstaBot():
 
 	def __init__(self):
 		self.home_url = 'https://www.instagram.com/'
+		#self.driver = self.get_driver()
+		
+
+		
+
+	def get_proxy(self, proxy):
+		# PROXY_HOST = '149.56.44.45'
+		# PROXY_PORT = str(random.randint(42000, 42197))
+		# PROXY_USER = 'dvpatel7437@gmail.com'
+		# PROXY_PASS = 'd0945hkild77'
+		#proxy = {'address': PROXY_IP+':'+PORT, 'username': 'dvpatel7437@gmail.com', 'password': 'd0945hkild77'}
+		manifest_json = """
+			{
+			    "version": "1.0.0",
+			    "manifest_version": 2,
+			    "name": "Chrome Proxy",
+			    "permissions": [
+			        "proxy",
+			        "tabs",
+			        "unlimitedStorage",
+			        "storage",
+			        "<all_urls>",
+			        "webRequest",
+			        "webRequestBlocking"
+			    ],
+			    "background": {
+			        "scripts": ["background.js"]
+			    },
+			    "minimum_chrome_version":"22.0.0"
+			}
+			"""
+
+		background_js = """
+		var config = {
+		        mode: "fixed_servers",
+		        rules: {
+		          singleProxy: {
+		            scheme: "http",
+		            host: "%s",
+		            port: parseInt(%s)
+		          },
+		          bypassList: ["localhost"]
+		        }
+		      };
+
+		chrome.proxy.settings.set({value: config, scope: "regular"}, function() {});
+
+		function callbackFn(details) {
+		    return {
+		        authCredentials: {
+		            username: "%s",
+		            password: "%s"
+		        }
+		    };
+		}
+
+		chrome.webRequest.onAuthRequired.addListener(
+		            callbackFn,
+		            {urls: ["<all_urls>"]},
+		            ['blocking']
+		);
+		""" % (proxy.get('PROXY_HOST'), proxy.get('PROXY_PORT'), proxy.get('PROXY_USER',''), proxy.get('PROXY_PASS',''))
+		return manifest_json, background_js
+
+	def get_driver(self, proxy=False):
+		path = os.path.dirname(os.path.abspath(__file__))
 		options = Options()
 		# options.add_argument("headless")
 		# options.add_argument("window-size=1920x1080")
-		# options.set_headless(headless=True)
+		#options.set_headless(headless=True)
 		#chrome_options.add_argument("--headless")  
 		#chrome_options.add_argument('--disable-gpu')
-		self.driver = webdriver.Chrome(r"./libs/chromedriver", chrome_options=options) #(service_args=service_args, executable_path='libs/phantomjs/phantomjs')
+		if proxy:
+			print('getting proxy')
+			manifest_json, background_js = self.get_proxy(proxy)
+			pluginfile = 'proxy_auth_plugin.zip'
+			with zipfile.ZipFile(pluginfile, 'w') as zp:
+				zp.writestr("manifest.json", manifest_json)
+				zp.writestr("background.js", background_js)
+			options.add_extension(pluginfile)
+
+		return webdriver.Chrome(r"./libs/chromedriver", chrome_options=options) #(service_args=service_args, executable_path='libs/phantomjs/phantomjs')
+
 
 	def waitElement(self, selector, by_type='CSS', _timeout=10):
 		try:
@@ -59,10 +140,50 @@ class InstaBot():
 		except:
 			pass
 
+
+	def get_data_proxy(self, data):
+		proxy = False
+		try:
+			p_ip_port = data.get('proxy_ip_port', False)
+			if p_ip_port:
+				proxy = {
+					'PROXY_HOST':p_ip_port.split(':')[0],
+					'PROXY_PORT':p_ip_port.split(':')[1],
+					'PROXY_USER':'',
+					'PROXY_PASS':''
+				}
+				p_un_pw = data.get('proxy_un_pw',':')
+				proxy['PROXY_USER'] = p_un_pw.split(':')[0]
+				proxy['PROXY_PASS'] = p_un_pw.split(':')[1]
+		except Exception as ex:
+			print('ex in get_data_proxy', ex)
+			pass
+
+		return proxy
+
+
+	def run_bulk(self, rows):
+		output = []
+		c = 0
+		for data in rows:
+			response = self.run(data)
+			output.append(response)
+			# if response['success'] or 'proxy' in data.keys():
+			# 	self.driver.quit()
+			# 	self.driver = self.get_driver()
+
+			c += 1
+
+			# if c % 3 == 0:
+			# 	self.driver.quit()
+			# 	self.driver = self.get_driver()
+
+		return output
 	
 	def run(self, data):
-
-		output = {'success':False, 'message':''}
+		proxy = self.get_data_proxy(data)
+		self.driver = self.get_driver(proxy=proxy)
+		output = {'email':data['email'], 'success':False, 'message':''}
 		try:
 			# data = {
 			# 	'email' : 'test@gmail.com', #'test13411@gmail.com',
@@ -70,7 +191,6 @@ class InstaBot():
 			# 	'fullName' : 'test g'
 			# 	}
 			# data['username'] = data['email'].split('@')[0]
-
 			self.driver.get(self.home_url)
 			#time.sleep(2)
 			
@@ -116,6 +236,7 @@ class InstaBot():
 		except Exception as ex:
 			output['message'] = str(ex)
 
+		self.driver.quit()
 		return output
 
 # ib = InstaBot()

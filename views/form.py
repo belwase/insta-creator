@@ -66,7 +66,7 @@ class NavBar(tk.Frame):
         {
             'button':{
                 'style':{'frame':self, 'text':'About', 'callback':lambda: controller.show_frame("AboutPage"), 'height':1, 'width':10, 'font':'TkDefaultFont 16 bold', 'bg':'green', 'fg':'#F2FFFF', 'activebackground':'#365899', 'activeforeground':'#F2FFFF'},
-                'grid':{'row':8, 'column':1,  'sticky':tk.W}
+                'grid':{'row':9, 'column':1,  'sticky':tk.W}
                 }
         }
         )
@@ -158,6 +158,13 @@ class StartPage(tk.Frame):
             )
 
 
+        self.controller.lbl_output_single = self.builder.createLabel(
+                {
+                 'label':{'style':{'frame':frame, 'text':'', 'fg':'red'},
+                 'grid':{'row':8, 'column':2, 'padx':10, 'sticky':tk.W}
+                 }
+                }
+            )
     
 
 
@@ -201,4 +208,28 @@ class BulkCreator(tk.Frame):
                 }
             )
 
+        self.controller.lbl_output_bulk = self.builder.createLabel(
+                {
+                 'label':{'style':{'frame':frame, 'text':'', 'fg':'red'},
+                 'grid':{'row':8, 'column':1, 'padx':10, 'sticky':tk.W}
+                 }
+                }
+            )
     	
+class SettingPage(tk.Frame):
+
+    def __init__(self, parent, controller, builder):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+        self.builder = builder
+
+        frame = tk.Frame(self, width=500, height=300)
+        frame.pack(fill=tk.BOTH)
+
+
+        self.builder.createCheckBox(
+            {
+                'style':{'frame':frame,'text':'Use Proxy', 'variable':self.controller.use_proxy, 'font':'TkDefaultFont 12 bold'},
+                'grid':{'row':2, 'column':1, 'sticky':tk.W},
+            }
+            )

@@ -53,6 +53,13 @@ def csvtoDict(path):
 
 		# return rows
 
+def listtoCSSV(l, filename):
+	keys = l[0].keys()
+	with open(filename, 'w') as output_file:
+	    dict_writer = csv.DictWriter(output_file, keys)
+	    dict_writer.writeheader()
+	    dict_writer.writerows(l)
+
 
 def load_settings():
     settings = json.loads(open('./settings.json', 'r').read())['settings']
