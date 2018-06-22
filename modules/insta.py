@@ -5,6 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options
 
 import time
 
@@ -12,7 +13,13 @@ class InstaBot():
 
 	def __init__(self):
 		self.home_url = 'https://www.instagram.com/'
-		self.driver = webdriver.Chrome(r"./libs/chromedriver") #(service_args=service_args, executable_path='libs/phantomjs/phantomjs')
+		options = Options()
+		# options.add_argument("headless")
+		# options.add_argument("window-size=1920x1080")
+		# options.set_headless(headless=True)
+		#chrome_options.add_argument("--headless")  
+		#chrome_options.add_argument('--disable-gpu')
+		self.driver = webdriver.Chrome(r"./libs/chromedriver", chrome_options=options) #(service_args=service_args, executable_path='libs/phantomjs/phantomjs')
 
 	def waitElement(self, selector, by_type='CSS', _timeout=10):
 		try:
@@ -65,40 +72,47 @@ class InstaBot():
 			# data['username'] = data['email'].split('@')[0]
 
 			self.driver.get(self.home_url)
-			time.sleep(2)
+			#time.sleep(2)
 			
 			self.waitElement("input[name=emailOrPhone]")
 			self.fillText("emailOrPhone", data['email'])
-			self.fillText("fullName", data['fullName'])
+			self.fillText("fullName", data['fullname'])
 			self.fillText("username", data['username'])
 			self.fillText("password", data['password'])
+
+			self.driver.save_screenshot("screenshot.png")
+
 
 			# button = WebDriverWait(self.driver, 20).until(
 			# 	EC.element_to_be_clickable((By.XPATH, "//*[contains(text(), 'Sign up')]")));
 
-			buttons = self.driver.find_elements_by_css_selector('button[class="_5f5mN       jIbKX KUBKM      yZn4P   "]')
+			buttons = self.driver.find_elements_by_css_selector('button')#[class="_5f5mN       jIbKX KUBKM      yZn4P   "]')
 			for button in buttons:
 				if 'sign up' in button.text.lower():
-					print(button)
 					button.click()
 
 
+			self.driver.save_screenshot("screenshot2.png")
 			try:
-				self.waitElement('p[id=ssfErrorAlert]')
-				error = self.driver.find_element_by_css_selector('p[id=ssfErrorAlert]')
-				output['message'] = error.text
-			except Exception as ex:
+				self.driver.save_screenshot("screenshot3.png")
+				self.waitElement("a[href='/{}/']".format(data['username']))
+				profile = self.driver.find_element_by_css_selector("a[href='/{}/']".format(data['username']))
+				output['success'] = True
+				print('account created')
 				##success !! account created
 				## <a class="Szr5J kIKUG coreSpriteDesktopNavProfile" href="/test13411/">Profile</a>
 				# <a href="/accounts/activity/" class="_0ZPOP kIKUG coreSpriteDesktopNavActivity  "><span class="Szr5J">Activity Feed</span></a>
 
+			except Exception as e:
 				try:
-					self.waitElement("a[href='/{}/']".format(data['username']))
-					profile = self.driver.find_element_by_css_selector("a[href='/{}/']".format(data['username']))
-					output['success'] = True
-				except Exception as e:
-					output['message'] = str(e)
-				print('account created')
+					self.waitElement('p[id=ssfErrorAlert]', _timeout=5)
+					error = self.driver.find_element_by_css_selector('p[id=ssfErrorAlert]')
+					self.driver.save_screenshot("screenshot3.png")
+					output['message'] = error.text
+				except Exception as ex:
+					output['message'] = 'Unable to create account'
+					
+				
 		except Exception as ex:
 			output['message'] = str(ex)
 

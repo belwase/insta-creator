@@ -120,19 +120,23 @@ class FormMain(Form):
         data = {
             'username': self.username.get(), 'password':self.password.get(), 'email':self.email.get(), 'fullname':self.fullname.get()
         }
-        data = {
-                'email' : 'test@gmail.com', #'test13411@gmail.com',
-                'password' : '12eafe5678@12@',
-                'fullName' : 'test g'
-                }
-        data['username'] = data['email'].split('@')[0]
-        self.logger.info('Payload :: {}'.format(data))
-        status = 'Creating account : {} ......'.format(data['email'])
-        self.lbl_status_single.config(text=status)
-        messagebox.showwarning("Info",status )
-        response = UIHandler.create_account(data)
-        self.logger.info('Response for {} :: {}'.format(data['email'], response))
-        self.lbl_status_single.config(text=response['message'])
+        # data = {
+        #         'email' : 'test@gmail.com', #'test13411@gmail.com',
+        #         'password' : '12eafe5678@12@',
+        #         'fullName' : 'test g'
+        #         }
+        #data['username'] = data['email'].split('@')[0]
+
+        if data['username'] == '' or data['email'] == '' or data['password'] == '' or data['fullname'] == '':
+            messagebox.showwarning("Warning", "Please enter all details")
+        else:
+            self.logger.info('Payload :: {}'.format(data))
+            status = 'Creating account : {} ......'.format(data['email'])
+            self.lbl_status_single.config(text=status)
+            messagebox.showwarning("Info",status )
+            response = UIHandler.create_account(data)
+            self.logger.info('Response for {} :: {}'.format(data['email'], response))
+            self.lbl_status_single.config(text=response['message'])
 
 
     def create_account_bulk(self,event=None):
