@@ -13,7 +13,7 @@ class Builder:
         self.master = master
         self.style = ttk.Style()
         self.defaults = {
-            'label':{'fg':'#365899', 'bg':'#E9EBEE'},
+            'label':{'fg':'#365899', 'bg':'#a9c8e5'},
             'button':{'fg':'#F2FFFF', 'bg':'#3B5970', 'activebackground':'#365899', 'activeforeground':'#F2FFFF', 'cursor':'hand2'}
         }
 

@@ -121,8 +121,8 @@ class FormMain(Form):
         self.title_font = tkfont.Font(family='Helvetica', size=18, weight="bold", slant="italic")
         
         self.master.title(self.settings['APP_NAME'])
-        self.master.geometry("800x450+50+100")
-        self.master.config(bg='#E9EBEE')
+        self.master.geometry("800x400+50+100")
+        self.master.config(bg='#a9c8e5')
         self.master.resizable(0,0)
 
 
@@ -130,14 +130,14 @@ class FormMain(Form):
 
 
         frame = NavBar(parent=master, controller=self, builder=self.builder)
-        frame.grid(row=5, column=1, sticky="w")
+        frame.grid(row=10, column=1, sticky="w")
 
         self.frames = {}
         for F in (StartPage, BulkCreator, SettingPage):
             page_name = F.__name__
             frame = F(parent=master, controller=self, builder=self.builder)
             self.frames[page_name] = frame
-            frame.grid(row=5, column=5, sticky="nsew")
+            frame.grid(row=10, column=10, sticky="nsew")
 
         self.show_frame("StartPage")
 
@@ -152,12 +152,12 @@ class FormMain(Form):
         data = {
             'username': self.username.get(), 'password':self.password.get(), 'email':self.email.get(), 'fullname':self.fullname.get()
         }
-        data = {
-                'email' : 'test@gmail.com', #'test13411@gmail.com',
-                'password' : '12eafe5678@12@',
-                'fullname' : 'test g'
-                }
-        data['username'] = data['email'].split('@')[0]
+        # data = {
+        #         'email' : 'test@gmail.com', #'test13411@gmail.com',
+        #         'password' : '12eafe5678@12@',
+        #         'fullname' : 'test g'
+        #         }
+        # data['username'] = data['email'].split('@')[0]
 
         if data['username'] == '' or data['email'] == '' or data['password'] == '' or data['fullname'] == '':
             messagebox.showwarning("Warning", "Please enter all details")

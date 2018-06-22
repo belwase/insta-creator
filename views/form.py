@@ -25,11 +25,13 @@ class NavBar(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.controller = controller
         self.builder = builder
+
+        self.config(bg='#a9c8e5')
         
         self.builder.createLabel(
                 {
-                 'label':{'style':{'frame':self, 'text':'Insta Creator V1.0'},
-                 'grid':{'row':5, 'column':1, 'padx':0, 'sticky':tk.W}
+                 'label':{'style':{'frame':self, 'text':'Insta Creator','font':'TkDefaultFont 20 bold',},
+                 'grid':{'row':1, 'column':1, 'padx':0, 'sticky':tk.W}
                  }
                 }
             )
@@ -79,6 +81,7 @@ class StartPage(tk.Frame):
         self.controller = controller
         self.builder = builder
 
+        self.config(bg='#a9c8e5')
 
         self.username = ''
         self.password = ''
@@ -87,6 +90,7 @@ class StartPage(tk.Frame):
 
         frame = tk.Frame(self, width=500, height=300)
         frame.pack(fill=tk.BOTH)
+        frame.config(bg='#a9c8e5')
 
 
         # self.builder.createLabel(
@@ -176,8 +180,11 @@ class BulkCreator(tk.Frame):
         self.controller = controller
         self.builder = builder
 
+        self.config(bg='#a9c8e5')
+
         frame = tk.Frame(self, width=500, height=300)
         frame.pack(fill=tk.BOTH)
+        frame.config(bg='#a9c8e5')
 
 
         self.controller.bulk_csv_input = self.builder.createTextBox(
@@ -223,8 +230,11 @@ class SettingPage(tk.Frame):
         self.controller = controller
         self.builder = builder
 
+        self.config(bg='#a9c8e5')
+
         frame = tk.Frame(self, width=500, height=300)
         frame.pack(fill=tk.BOTH)
+        frame.config(bg='#a9c8e5')
 
 
         self.builder.createCheckBox(
